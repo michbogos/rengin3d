@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, os::unix::thread, time::Duration};
 
 mod draw;
 
@@ -15,13 +15,11 @@ fn main() {
         }
     }
     let mut surface : draw::Surface = draw::Surface::new(width, height);
-    surface.clear();
-    for i in 0..165{
-        for j in 0..10{
-            if (i/4+j/4) % 2 == 0{
-                surface.set(i, j);
-            }
-        }
+    for x in 0..width{
+        surface.clear();
+        // draw::reset_cursor();
+        surface.draw_line(0, 0, width-x-1, height-1);
+        surface.show();
+        std::thread::sleep(Duration::from_millis(33));
     }
-    surface.show();
 }
