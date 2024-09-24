@@ -51,6 +51,31 @@ impl Surface{
             d+=2*dy;
         }
     }
+
+    pub fn draw_circle(&mut self, x0:i32, y0:i32, r:i32){
+        let mut d:i32 = 3-2*r as i32;
+        let mut x:i32 = 0;
+        let mut y:i32 = r;
+        while !(x >= y){
+            self.set((x+x0 ) as usize, (y+y0)  as usize);
+            self.set((y+x0 ) as usize, (x+y0)  as usize);
+            self.set((-y+x0) as usize, (x+y0)  as usize);
+            self.set((-x+x0) as usize, (y+y0)  as usize);
+            self.set((-x+x0) as usize, (-y+y0) as usize);
+            self.set((-y+x0) as usize, (-x+y0) as usize);
+            self.set((y+x0 ) as usize, (-x+y0) as usize);
+            self.set((x+x0 ) as usize, (-y+y0) as usize);
+        }
+        if d < 0{
+            d += 4*x+6;
+            x +=1;
+        }
+        if d >= 0{
+            d += 4*(x-y)+10;
+            x += 1;
+            y -= 1;
+        }
+    }
 }
 
 pub fn reset_cursor(){

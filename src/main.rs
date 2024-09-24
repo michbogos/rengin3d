@@ -4,22 +4,17 @@ mod draw;
 
 fn main() {
     let args:Vec<String> = env::args().collect();
-    let mut height:usize = 20;
-    let mut width:usize = 80;
+    let mut height:i32 = 20;
+    let mut width:i32= 80;
     for arg in &args{
         if arg.contains("width"){
-            width = arg.split("=").last().unwrap().parse::<usize>().unwrap();
+            width = arg.split("=").last().unwrap().parse::<i32>().unwrap();
         }
         if arg.contains("height"){
-            height = arg.split("=").last().unwrap().parse::<usize>().unwrap();
+            height = arg.split("=").last().unwrap().parse::<i32>().unwrap();
         }
     }
-    let mut surface : draw::Surface = draw::Surface::new(width, height);
-    for x in 0..width{
-        surface.clear();
-        // draw::reset_cursor();
-        surface.draw_line(0, 0, width-x-1, height-1);
-        surface.show();
-        std::thread::sleep(Duration::from_millis(33));
-    }
+    let mut surface : draw::Surface = draw::Surface::new(width as usize, height as usize);
+    surface.draw_circle(10, 10, 2);
+    surface.show();
 }
