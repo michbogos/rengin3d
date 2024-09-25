@@ -15,6 +15,6 @@ fn main() {
         }
     }
     let mut surface : draw::Surface = draw::Surface::new(width as usize, height as usize);
-    surface.draw_line(0, 0, width, height);
+    surface.draw_line(0, 0, width, height, draw::Color {r:255, g:255, b:255});
     surface.show();
 }

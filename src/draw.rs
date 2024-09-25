@@ -1,18 +1,23 @@
-use std::{io::Write, mem::swap};
+use std::{fmt::format, io::Write, mem::swap};
 
-
+#[derive(Copy, Clone)]
+pub struct Color{
+    pub r:u8,
+    pub g:u8,
+    pub b:u8,
+}
 
 pub struct Surface{
     width : usize,
     height : usize,
-    buffer : Vec<char>,
+    buffer : Vec<Color>,
     output: std::io::Stdout
 }
 
 
 impl Surface{
     pub fn new(width:usize, height:usize)->Surface{
-        let buffer:Vec<char> = vec![' '; width*height];
+        let buffer:Vec<Color> = vec![Color {r:0, g:0, b:0}; width*height];
         let output:std::io::Stdout = std::io::stdout();
         return Surface {width, height, buffer, output};
     }
@@ -20,24 +25,24 @@ impl Surface{
     pub fn clear(&mut self){
         let size = self.buffer.len();
         self.buffer.clear();
-        self.buffer.resize(size, ' ');
+        self.buffer.resize(size, Color {r:0, g:0, b:0});
     }
 
     pub fn show(&mut self){
-        let _ = self.output.write(self.buffer.iter().map(|c|c.to_string()).collect::<Vec<String>>().join("").as_bytes());
+        let _ = self.output.write(self.buffer.iter().map(|c|ansi_truecolor(*c, Color {r:0, g:0, b:0})).collect::<Vec<String>>().join("").as_bytes());
     }
 
-    pub fn set(&mut self, x:i32, y:i32){
+    pub fn set(&mut self, x:i32, y:i32, color:Color){
         if x as usize>=self.width{
             return;
         }
         if y as usize >=self.height{
             return;
         }
-        self.buffer[y as usize *self.width+x as usize] = '▀';
+        self.buffer[y as usize *self.width+x as usize] = color;
     }
 
-    pub fn draw_line(&mut self, mut x0:i32, mut y0:i32, mut x1:i32, mut y1:i32){
+    pub fn draw_line(&mut self, mut x0:i32, mut y0:i32, mut x1:i32, mut y1:i32, col:Color){
         let mut steep:bool = false;
         if x0.abs_diff(x1)<y0.abs_diff(y1){
             swap(&mut x0, &mut y0);
@@ -55,10 +60,10 @@ impl Surface{
         let mut y :i32 = y0;
         for x in x0..x1+1{
             if steep{
-                self.set(y, x);
+                self.set(y, x, col);
             }
             else{
-                self.set(x, y);
+                self.set(x, y, col);
             }
             error += derror;
             if error > dx{
@@ -68,19 +73,19 @@ impl Surface{
         }
     }
 
-    pub fn draw_circle(&mut self, x0:i32, y0:i32, r:i32){
+    pub fn draw_circle(&mut self, x0:i32, y0:i32, r:i32, col:Color){
         let mut d:i32 = 3-2*r as i32;
         let mut x:i32 = 0;
         let mut y:i32 = r;
         while y >= x{
-            self.set(x+x0 , y+y0 );
-            self.set(y+x0 , x+y0 );
-            self.set(-y+x0, x+y0 );
-            self.set(-x+x0, y+y0 );
-            self.set(-x+x0, -y+y0);
-            self.set(-y+x0, -x+y0);
-            self.set(y+x0 , -x+y0);
-            self.set(x+x0 , -y+y0);
+            self.set(x+x0 , y+y0 , col);
+            self.set(y+x0 , x+y0 , col);
+            self.set(-y+x0, x+y0 , col);
+            self.set(-x+x0, y+y0 , col);
+            self.set(-x+x0, -y+y0, col);
+            self.set(-y+x0, -x+y0, col);
+            self.set(y+x0 , -x+y0, col);
+            self.set(x+x0 , -y+y0, col);
             if d > 0{
                 d += 4*(x-y)+10;
                 y -=1;
@@ -95,4 +100,8 @@ impl Surface{
 
 pub fn reset_cursor(){
     print!("\0033\0143");
+}
+
+fn ansi_truecolor(fg:Color, bg:Color)->String{
+    return format!("\x1b[38;2;{};{};{};48;2;{};{};{}m ", fg.r, fg.b, fg.g, bg.r, bg.g, bg.b)
 }
