@@ -15,6 +15,6 @@ fn main() {
         }
     }
     let mut surface : draw::Surface = draw::Surface::new(width as usize, height as usize);
-    surface.draw_circle(10, 10, 2);
+    surface.draw_circle(width/2, height/2, height/4);
     surface.show();
 }

@@ -56,7 +56,7 @@ impl Surface{
         let mut d:i32 = 3-2*r as i32;
         let mut x:i32 = 0;
         let mut y:i32 = r;
-        while !(x >= y){
+        while y >= x{
             self.set((x+x0 ) as usize, (y+y0)  as usize);
             self.set((y+x0 ) as usize, (x+y0)  as usize);
             self.set((-y+x0) as usize, (x+y0)  as usize);
@@ -65,15 +65,14 @@ impl Surface{
             self.set((-y+x0) as usize, (-x+y0) as usize);
             self.set((y+x0 ) as usize, (-x+y0) as usize);
             self.set((x+x0 ) as usize, (-y+y0) as usize);
-        }
-        if d < 0{
-            d += 4*x+6;
-            x +=1;
-        }
-        if d >= 0{
-            d += 4*(x-y)+10;
+            if d > 0{
+                d += 4*(x-y)+10;
+                y -=1;
+            }
+            else {
+                d += 4*x+6;
+            }
             x += 1;
-            y -= 1;
         }
     }
 }
