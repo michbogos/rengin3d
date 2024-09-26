@@ -29,7 +29,15 @@ impl Surface{
     }
 
     pub fn show(&mut self){
-        let _ = self.output.write(self.buffer.iter().map(|c|ansi_truecolor(*c, Color {r:0, g:0, b:0})).collect::<Vec<String>>().join("").as_bytes());
+        let mut outString: String = String::from("");
+        for i in (0..self.height).step_by(2){
+            for j in 0..self.width{
+                let col1:Color = self.buffer[i*self.width+j];
+                let col2:Color = self.buffer[(i+1)*self.width+j];
+                outString.push_str(ansi_truecolor(col1, col2, '▀').as_str());
+            }
+        }
+        let _ = self.output.write(outString.as_bytes());
     }
 
     pub fn set(&mut self, x:i32, y:i32, color:Color){
@@ -102,6 +110,6 @@ pub fn reset_cursor(){
     print!("\0033\0143");
 }
 
-fn ansi_truecolor(fg:Color, bg:Color)->String{
-    return format!("\x1b[38;2;{};{};{};48;2;{};{};{}m ", fg.r, fg.b, fg.g, bg.r, bg.g, bg.b)
+fn ansi_truecolor(fg:Color, bg:Color, c:char)->String{
+    return format!("\x1b[38;2;{};{};{};48;2;{};{};{}m{}", fg.r, fg.b, fg.g, bg.r, bg.g, bg.b, c)
 }

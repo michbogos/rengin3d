@@ -14,7 +14,8 @@ fn main() {
             height = arg.split("=").last().unwrap().parse::<i32>().unwrap();
         }
     }
-    let mut surface : draw::Surface = draw::Surface::new(width as usize, height as usize);
-    surface.draw_line(0, 0, width, height, draw::Color {r:255, g:255, b:255});
+    let mut surface : draw::Surface = draw::Surface::new(width as usize, (height*2) as usize);
+    surface.clear();
+    surface.draw_line(20, 20, 5, 0, draw::Color {r:0, g:231, b:95});
     surface.show();
 }
