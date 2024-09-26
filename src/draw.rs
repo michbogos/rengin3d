@@ -111,5 +111,5 @@ pub fn reset_cursor(){
 }
 
 fn ansi_truecolor(fg:Color, bg:Color, c:char)->String{
-    return format!("\x1b[38;2;{};{};{};48;2;{};{};{}m{}", fg.r, fg.b, fg.g, bg.r, bg.g, bg.b, c)
+    return format!("\x1b[38;2;{};{};{};48;2;{};{};{}m{}", fg.r, fg.g, fg.b, bg.r, bg.g, bg.b, c)
 }
