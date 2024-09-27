@@ -51,33 +51,17 @@ impl Surface{
     }
 
     pub fn draw_line(&mut self, mut x0:i32, mut y0:i32, mut x1:i32, mut y1:i32, col:Color){
-        let mut steep:bool = false;
-        if x0.abs_diff(x1)<y0.abs_diff(y1){
-            swap(&mut x0, &mut y0);
-            swap(&mut x1, &mut y1);
-            steep=true;
-        }
-        if x0 > x1{
-            swap(&mut x0, &mut x1);
-            swap(&mut y0, &mut y1);
-        }
-        let dx:i32 = x1 - x0;
-        let dy:i32 = y1 - y0;
-        let derror :i32 = (2*dy).abs();
-        let mut error:i32 = 0;
-        let mut y :i32 = y0;
-        for x in x0..x1+1{
-            if steep{
-                self.set(y, x, col);
-            }
-            else{
-                self.set(x, y, col);
-            }
-            error += derror;
-            if error > dx{
-                y += if(y1>y0){1} else{-1};
-                error-=2*derror;
-            }
+        let dx:i32 = x0.abs_diff(x1) as i32;
+        let dy:i32 = -(y0.abs_diff(y1) as i32);
+        let sx:i32 = if x0<x1 {1} else {-1};
+        let sy:i32 = if y0<y1 {1} else {-1};
+        let mut err:i32 = dx+dy;
+        let mut e2:i32;
+        while !(x0==x1 && y0==y1){
+            self.set(x0, y0, col);
+            e2 = 2*err;
+            if e2 >= dy { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+            if e2 <= dx { err += dx; y0 += sy; }
         }
     }
 
@@ -104,6 +88,23 @@ impl Surface{
             x += 1;
         }
     }
+
+    pub fn fill_circle(&mut self, x0:i32, y0:i32, r:i32, col:Color){
+        for i in y0-r..y0+r{
+            for j in x0-r..x0+r{
+                if (j-x0)*(j-x0) + (i-y0)*(i-y0) < r*r{
+                    self.set(j, i, col);
+                }
+            }
+        }
+    }
+
+    pub fn draw_triangle(&mut self, ax:i32, ay:i32, bx:i32, by:i32, cx:i32, cy:i32, col:Color){
+        self.draw_line(ax, ay, bx, by, col);
+        self.draw_line(bx, by, cx, cy, col);
+        self.draw_line(cx, cy, ax, ay, col);
+    }
+
 }
 
 pub fn reset_cursor(){

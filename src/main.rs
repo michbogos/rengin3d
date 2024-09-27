@@ -11,11 +11,12 @@ fn main() {
             width = arg.split("=").last().unwrap().parse::<i32>().unwrap();
         }
         if arg.contains("height"){
-            height = arg.split("=").last().unwrap().parse::<i32>().unwrap();
+            height = arg.split("=").last().unwrap().parse::<i32>().unwrap()*2;
         }
     }
-    let mut surface : draw::Surface = draw::Surface::new(width as usize, (height*2) as usize);
+    let mut surface : draw::Surface = draw::Surface::new(width as usize, height as usize);
     surface.clear();
-    surface.draw_line(20, 20, 5, 0, draw::Color {r:0, g:231, b:95});
+    surface.fill_circle(width/2, height/2, 30, draw::Color {r:128, g:65, b:234});
+    surface.draw_triangle(0, 0, 10, 10, 10, 0, draw::Color {r:95, g:253, b:145});
     surface.show();
 }
