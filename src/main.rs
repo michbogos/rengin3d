@@ -1,6 +1,7 @@
 use std::{env, os::unix::thread, time::Duration};
 
 mod draw;
+mod linalg;
 
 fn main() {
     let args:Vec<String> = env::args().collect();

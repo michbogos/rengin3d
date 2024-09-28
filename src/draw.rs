@@ -1,4 +1,5 @@
-use std::{fmt::format, io::Write, mem::swap};
+use std::io::Write;
+use crate::linalg
 
 #[derive(Copy, Clone)]
 pub struct Color{
@@ -108,7 +109,7 @@ impl Surface{
 }
 
 pub fn reset_cursor(){
-    print!("\0033\0143");
+    print!("\x1b\x63");
 }
 
 fn ansi_truecolor(fg:Color, bg:Color, c:char)->String{
