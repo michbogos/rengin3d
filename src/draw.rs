@@ -1,5 +1,5 @@
 use std::io::Write;
-use crate::linalg
+use crate::linalg::vec2;
 
 #[derive(Copy, Clone)]
 pub struct Color{
@@ -104,6 +104,42 @@ impl Surface{
         self.draw_line(ax, ay, bx, by, col);
         self.draw_line(bx, by, cx, cy, col);
         self.draw_line(cx, cy, ax, ay, col);
+    }
+
+    pub fn fill_triangle(&mut self, ax:i32, ay:i32, bx:i32, by:i32, cx:i32, cy:i32, col:Color){
+        let a : vec2<f32> = vec2::<f32> {x:ax as f32, y:ay as f32};
+        let b : vec2<f32> = vec2::<f32> {x:bx as f32, y:by as f32};
+        let c : vec2<f32> = vec2::<f32> {x:cx as f32, y:cy as f32};
+
+        let minx:f32 = a.x.min(b.x).min(c.x);
+        let maxx:f32 = a.x.max(b.x).max(c.x);
+
+        let miny:f32 = a.y.min(b.y).min(c.y);
+        let maxy:f32 = a.y.max(b.y).max(c.y);
+
+        let v0 = b-a;
+        let v1 = c-a;
+
+        let d00 = v0*v0;
+        let d01 = v0*v1;
+        let d11 = v1*v1;
+
+        for i in miny as i32 .. maxy as i32{
+            for j in minx as i32 .. maxx as i32{
+                let p: vec2<f32> = vec2::<f32> {x:j as f32, y:i as f32};
+                let v2 = p-a;
+                let d20 = v2*v0;
+                let d21 = v2*v1;
+                let denom = d00 * d11 - d01 * d01;
+                let v = (d11 * d20 - d01 * d21) / denom;
+                let w = (d00 * d21 - d01 * d20) / denom;
+                let u = 1.0 - v - w;
+                if v > 0.0 && w > 0.0 && u > 0.0{
+                    self.set(i, j, col);
+                }
+            }
+        }
+
     }
 
 }
