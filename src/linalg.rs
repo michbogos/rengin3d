@@ -8,16 +8,13 @@ std::ops::Mul<Output=T>
 {}
 
 macro_rules! impl_algebraic{
-    ($numType:ty) => {
+    ($($numType:ty)*) => ($(
         impl Algebraic<$numType> for $numType{
         }
-    };
+    )*)
 }
 
-impl_algebraic!(i32);
-impl_algebraic!(i64);
-impl_algebraic!(f32);
-impl_algebraic!(f64);
+impl_algebraic!(isize i8 i16 i32 i64 i128 f32 f64);
 
 #[derive(Debug, Copy, Clone, Default)]
 pub struct vec2<T:Algebraic<T>>{
@@ -100,23 +97,21 @@ impl<T:Algebraic<T>> std::ops::Neg for vec4<T>{
 
 // Subtration
 macro_rules! impl_vec_subtract{
-    ($vecType:ty)=>{
+    ($($vecType:ty)*)=>($(
         impl<T:Algebraic<T>> std::ops::Sub<$vecType> for $vecType{
             type Output = $vecType;
             fn sub(self, _rhs:$vecType)->$vecType{
                 return self+(-_rhs);
             }
         }
-    }
+    )*)
 }
 
-impl_vec_subtract!(vec2<T>);
-impl_vec_subtract!(vec3<T>);
-impl_vec_subtract!(vec4<T>);
+impl_vec_subtract!(vec2<T> vec3<T> vec4<T>);
 
 macro_rules! impl_vec2_scale
 {
-    ($numType:ty)=>{
+    ($($numType:ty)*)=>{$(
         impl<T:Algebraic<T>> std::ops::Mul<vec2<T>> for $numType where $numType:std::ops::Mul<T, Output=T>{
             type Output = vec2<T>;
             fn mul(self, _rhs:vec2<T>)->vec2<T>{
@@ -126,12 +121,12 @@ macro_rules! impl_vec2_scale
                 return res;
             }
         }
-    }
+    )*}
 }
 
 macro_rules! impl_vec3_scale
 {
-    ($numType:ty)=>{
+    ($($numType:ty)*)=>{$(
         impl<T:Algebraic<T>> std::ops::Mul<vec3<T>> for $numType where $numType:std::ops::Mul<T, Output=T>{
             type Output = vec3<T>;
             fn mul(self, _rhs:vec3<T>)->vec3<T>{
@@ -142,12 +137,12 @@ macro_rules! impl_vec3_scale
                 return res;
             }
         }
-    }
+    )*}
 }
 
 macro_rules! impl_vec4_scale
 {
-    ($numType:ty)=>{
+    ($($numType:ty)*)=>($(
         impl<T:Algebraic<T>> std::ops::Mul<vec4<T>> for $numType where $numType:std::ops::Mul<T, Output=T>{
             type Output = vec4<T>;
             fn mul(self, _rhs:vec4<T>)->vec4<T>{
@@ -159,21 +154,18 @@ macro_rules! impl_vec4_scale
                 return res;
             }
         }
-    }
+    )*)
 }
 
-impl_vec2_scale!(f32);
-impl_vec2_scale!(f64);
-impl_vec3_scale!(f32);
-impl_vec3_scale!(f64);
-impl_vec4_scale!(f32);
-impl_vec4_scale!(f64);
+impl_vec2_scale!(isize i8 i16 i32 i64 i128 f32 f64);
+impl_vec3_scale!(isize i8 i16 i32 i64 i128 f32 f64);
+impl_vec4_scale!(isize i8 i16 i32 i64 i128 f32 f64);
 
 
 impl<T:Algebraic<T>> std::ops::Mul<vec2<T>> for vec2<T>{
-    type Output = <T as std::ops::Mul>::Output where <T as std::ops::Mul>::Output:std::default::Default;
-    fn mul(self, _rhs:vec2<T>)-><T as std::ops::Mul>::Output{
-        let mut res:<T as std::ops::Mul>::Output = <T as std::ops::Mul>::Output::default();
+    type Output = T;
+    fn mul(self, _rhs:vec2<T>)->T{
+        let mut res:T=T::default();
         res += self.x*(_rhs.x);
         res += self.y*(_rhs.y);
         return res;
