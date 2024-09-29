@@ -1,5 +1,7 @@
+#![allow(dead_code)]
+
 use std::io::Write;
-use crate::linalg::vec2;
+use crate::linalg::Vec2;
 
 #[derive(Copy, Clone)]
 pub struct Color{
@@ -30,15 +32,15 @@ impl Surface{
     }
 
     pub fn show(&mut self){
-        let mut outString: String = String::from("");
+        let mut out_string: String = String::from("");
         for i in (0..self.height).step_by(2){
             for j in 0..self.width{
                 let col1:Color = self.buffer[i*self.width+j];
                 let col2:Color = self.buffer[(i+1)*self.width+j];
-                outString.push_str(ansi_truecolor(col1, col2, '▀').as_str());
+                out_string.push_str(ansi_truecolor(col1, col2, '▀').as_str());
             }
         }
-        let _ = self.output.write(outString.as_bytes());
+        let _ = self.output.write(out_string.as_bytes());
     }
 
     pub fn set(&mut self, x:i32, y:i32, color:Color){
@@ -51,7 +53,7 @@ impl Surface{
         self.buffer[y as usize *self.width+x as usize] = color;
     }
 
-    pub fn draw_line(&mut self, mut x0:i32, mut y0:i32, mut x1:i32, mut y1:i32, col:Color){
+    pub fn draw_line(&mut self, mut x0:i32, mut y0:i32, x1:i32, y1:i32, col:Color){
         let dx:i32 = x0.abs_diff(x1) as i32;
         let dy:i32 = -(y0.abs_diff(y1) as i32);
         let sx:i32 = if x0<x1 {1} else {-1};
@@ -107,9 +109,9 @@ impl Surface{
     }
 
     pub fn fill_triangle(&mut self, ax:i32, ay:i32, bx:i32, by:i32, cx:i32, cy:i32, col:Color){
-        let a : vec2<f32> = vec2::<f32> {x:ax as f32, y:ay as f32};
-        let b : vec2<f32> = vec2::<f32> {x:bx as f32, y:by as f32};
-        let c : vec2<f32> = vec2::<f32> {x:cx as f32, y:cy as f32};
+        let a : Vec2<f32> = Vec2::<f32> {x:ax as f32, y:ay as f32};
+        let b : Vec2<f32> = Vec2::<f32> {x:bx as f32, y:by as f32};
+        let c : Vec2<f32> = Vec2::<f32> {x:cx as f32, y:cy as f32};
 
         let minx:f32 = a.x.min(b.x).min(c.x);
         let maxx:f32 = a.x.max(b.x).max(c.x);
@@ -126,7 +128,7 @@ impl Surface{
 
         for i in miny as i32 .. maxy as i32{
             for j in minx as i32 .. maxx as i32{
-                let p: vec2<f32> = vec2::<f32> {x:j as f32, y:i as f32};
+                let p: Vec2<f32> = Vec2::<f32> {x:j as f32, y:i as f32};
                 let v2 = p-a;
                 let d20 = v2*v0;
                 let d21 = v2*v1;

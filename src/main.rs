@@ -1,5 +1,7 @@
 use std::env;
 
+use draw::reset_cursor;
+
 mod draw;
 mod linalg;
 
@@ -16,6 +18,7 @@ fn main() {
         }
     }
     let mut surface : draw::Surface = draw::Surface::new(width as usize, height as usize);
+    reset_cursor();
     surface.clear();
     surface.fill_circle(width/2, height/2, 30, draw::Color {r:128, g:65, b:234});
     surface.fill_triangle(0, 0, 10, 10, 10, 0, draw::Color {r:95, g:253, b:145});
