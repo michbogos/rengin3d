@@ -54,9 +54,16 @@ impl<const N:usize, T:Algebraic<T>> std::ops::Add<Vecn<N, T>> for Vecn<N, T>{
     fn add(self, _rhs:Vecn<N, T>)->Vecn<N, T>{
         let mut res:Vecn<N, T>=Vecn::<N,T>::default();
         for i in 0..N{
-            res.data[i] = self.data[i]+res.data[i];
+            res.data[i] = self.data[i]+_rhs.data[i];
         }
         return res;
+    }
+}
+impl<const N:usize, T:Algebraic<T>> std::ops::AddAssign<Vecn<N, T>> for Vecn<N, T>{
+    fn add_assign(&mut self, _rhs:Vecn<N, T>){
+        for i in 0..N{
+            self.data[i] = self.data[i]+_rhs.data[i];
+        }
     }
 }
 
@@ -75,12 +82,19 @@ impl<const N:usize, T:Algebraic<T>> std::ops::Sub<Vecn<N,T>> for Vecn<N,T>{
         return self+(-_rhs);
     }
 }
+impl<const N:usize, T:Algebraic<T>> std::ops::SubAssign<Vecn<N,T>> for Vecn<N,T>{
+    fn sub_assign(&mut self, _rhs:Vecn<N,T>){
+        for i in 0..N{
+            self.data[i] = self.data[i]+_rhs.data[i];
+        }
+    }
+}
 
 //Scale
 impl<const N:usize, T:Algebraic<T>> std::ops::Mul<T> for Vecn<N,T>{
     type Output = Vecn<N,T>;
     fn mul(self, _rhs:T)->Vecn<N,T>{
-        return Vecn::<N,T>{data:self.data.map(|x:T|_rhs*x)};
+        return Vecn::<N,T>{data:self.data.map(|x:T|x*_rhs)};
     }
 }
 
