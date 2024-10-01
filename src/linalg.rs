@@ -1,5 +1,6 @@
 pub trait Algebraic<T>:
 std::ops::Mul<Output=T>
++std::ops::Div<Output=T>
 +Copy
 +std::ops::Add<Output=T>
 +std::ops::AddAssign
@@ -76,19 +77,20 @@ impl<const N:usize, T:Algebraic<T>> std::ops::Sub<Vecn<N,T>> for Vecn<N,T>{
 }
 
 //Scale
-macro_rules! impl_Vecn_scale
-{
-    ($($numType:ty)*)=>($(
-        impl<const N:usize, T:Algebraic<T>> std::ops::Mul<Vecn<N, T>> for $numType where $numType:std::ops::Mul<T, Output=T>{
-            type Output = Vecn<N,T>;
-            fn mul(self, _rhs:Vecn<N,T>)->Vecn<N,T>{
-                return Vecn::<N,T>{data:_rhs.data.map(|x:T|self*x)};
-            }
-        }
-    )*)
+impl<const N:usize, T:Algebraic<T>> std::ops::Mul<T> for Vecn<N,T>{
+    type Output = Vecn<N,T>;
+    fn mul(self, _rhs:T)->Vecn<N,T>{
+        return Vecn::<N,T>{data:self.data.map(|x:T|_rhs*x)};
+    }
 }
 
-impl_Vecn_scale!(isize i8 i16 i32 i64 i128 f32 f64);
+//Divide
+impl<const N:usize, T:Algebraic<T>> std::ops::Div<T> for Vecn<N, T>{
+    type Output = Vecn<N,T>;
+    fn div(self, _rhs:T)->Vecn<N,T>{
+        return Vecn::<N,T>{data:self.data.map(|x:T|x/_rhs)};
+    }
+}
 
 //Dot product
 impl<const N:usize, T:Algebraic<T>> std::ops::Mul<Vecn<N,T>> for Vecn<N,T>{
