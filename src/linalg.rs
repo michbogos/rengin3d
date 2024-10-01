@@ -37,6 +37,17 @@ pub struct Vec4<T:Algebraic<T>>{
     pub w:T
 }
 
+#[derive(Debug, Copy, Clone)]
+pub struct Vecn<const N:usize, T>{
+    pub data:[T; N]
+}
+
+impl<const N:usize, T:Algebraic<T>> std::default::Default for Vecn<N, T>{
+    fn default() -> Self {
+        return Vecn { data: [T::default();N]};
+    }
+}
+
 //Addition
 
 impl<T:Algebraic<T>> std::ops::Add<Vec2<T>> for Vec2<T>{
@@ -72,6 +83,17 @@ impl<T:Algebraic<T>> std::ops::Add<Vec4<T>> for Vec4<T>{
     }
 }
 
+impl<const N:usize, T:Algebraic<T>> std::ops::Add<Vecn<N, T>> for Vecn<N, T>{
+    type Output = Vecn<N, T>;
+    fn add(self, _rhs:Vecn<N, T>)->Vecn<N, T>{
+        let mut res:Vecn<N, T>=Vecn::<N,T>::default();
+        for i in 0..N{
+            res.data[i] = self.data[i]+res.data[i];
+        }
+        return res;
+    }
+}
+
 // Negation
 
 impl<T:Algebraic<T>> std::ops::Neg for Vec2<T>{
@@ -95,6 +117,13 @@ impl<T:Algebraic<T>> std::ops::Neg for Vec4<T>{
     }
 }
 
+impl<const N:usize, T:Algebraic<T>> std::ops::Neg for Vecn<N, T>{
+    type Output = Vecn<N, T>;
+    fn neg(self)->Vecn<N, T>{
+        return Vecn::<N,T> {data:self.data.map(|x:T|-x)};
+    }
+}
+
 // Subtration
 macro_rules! impl_vec_subtract{
     ($($vecType:ty)*)=>($(
@@ -105,6 +134,13 @@ macro_rules! impl_vec_subtract{
             }
         }
     )*)
+}
+
+impl<const N:usize, T:Algebraic<T>> std::ops::Sub<Vecn<N,T>> for Vecn<N,T>{
+    type Output = Vecn<N,T>;
+    fn sub(self, _rhs:Vecn<N,T>)->Vecn<N,T>{
+        return self+(-_rhs);
+    }
 }
 
 impl_vec_subtract!(Vec2<T> Vec3<T> Vec4<T>);
@@ -157,9 +193,22 @@ macro_rules! impl_Vec4_scale
     )*)
 }
 
+macro_rules! impl_Vecn_scale
+{
+    ($($numType:ty)*)=>($(
+        impl<const N:usize, T:Algebraic<T>> std::ops::Mul<Vecn<N, T>> for $numType where $numType:std::ops::Mul<T, Output=T>{
+            type Output = Vecn<N,T>;
+            fn mul(self, _rhs:Vecn<N,T>)->Vecn<N,T>{
+                return Vecn::<N,T>{data:_rhs.data.map(|x:T|self*x)};
+            }
+        }
+    )*)
+}
+
 impl_Vec2_scale!(isize i8 i16 i32 i64 i128 f32 f64);
 impl_Vec3_scale!(isize i8 i16 i32 i64 i128 f32 f64);
 impl_Vec4_scale!(isize i8 i16 i32 i64 i128 f32 f64);
+impl_Vecn_scale!(isize i8 i16 i32 i64 i128 f32 f64);
 
 
 impl<T:Algebraic<T>> std::ops::Mul<Vec2<T>> for Vec2<T>{
@@ -191,6 +240,17 @@ impl<T:Algebraic<T>> std::ops::Mul<Vec4<T>> for Vec4<T>{
         res += self.y*(_rhs.y);
         res += self.z*(_rhs.z);
         res += self.w*(_rhs.w);
+        return res;
+    }
+}
+
+impl<const N:usize, T:Algebraic<T>> std::ops::Mul<Vecn<N,T>> for Vecn<N,T>{
+    type Output = T;
+    fn mul(self, _rhs:Vecn<N,T>)->T{
+        let mut res:T = T::default();
+        for i in 0..N{
+            res += self.data[i]*_rhs.data[i];
+        }
         return res;
     }
 }

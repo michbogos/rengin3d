@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use std::io::Write;
-use crate::linalg::Vec2;
+use crate::linalg::Vecn;
 
 #[derive(Copy, Clone)]
 pub struct Color{
@@ -109,15 +109,15 @@ impl Surface{
     }
 
     pub fn fill_triangle(&mut self, ax:i32, ay:i32, bx:i32, by:i32, cx:i32, cy:i32, col:Color){
-        let a : Vec2<f32> = Vec2::<f32> {x:ax as f32, y:ay as f32};
-        let b : Vec2<f32> = Vec2::<f32> {x:bx as f32, y:by as f32};
-        let c : Vec2<f32> = Vec2::<f32> {x:cx as f32, y:cy as f32};
+        let a : Vecn<2, f32> = Vecn::<2, f32> {data:[(ax as f32), ay as f32]};
+        let b : Vecn<2, f32> = Vecn::<2, f32> {data:[(bx as f32), by as f32]};
+        let c : Vecn<2, f32> = Vecn::<2, f32> {data:[(cx as f32), cy as f32]};
 
-        let minx:f32 = a.x.min(b.x).min(c.x);
-        let maxx:f32 = a.x.max(b.x).max(c.x);
+        let minx:f32 = a.data[0].min(b.data[0]).min(c.data[0]);
+        let maxx:f32 = a.data[0].max(b.data[0]).max(c.data[0]);
 
-        let miny:f32 = a.y.min(b.y).min(c.y);
-        let maxy:f32 = a.y.max(b.y).max(c.y);
+        let miny:f32 = a.data[1].min(b.data[1]).min(c.data[1]);
+        let maxy:f32 = a.data[1].max(b.data[1]).max(c.data[1]);
 
         let v0 = b-a;
         let v1 = c-a;
@@ -128,7 +128,7 @@ impl Surface{
 
         for i in miny as i32 .. maxy as i32{
             for j in minx as i32 .. maxx as i32{
-                let p: Vec2<f32> = Vec2::<f32> {x:j as f32, y:i as f32};
+                let p: Vecn<2, f32> = Vecn::<2, f32> {data:[j as f32, i as f32]};
                 let v2 = p-a;
                 let d20 = v2*v0;
                 let d21 = v2*v1;
