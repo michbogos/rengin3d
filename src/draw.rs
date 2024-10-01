@@ -113,11 +113,11 @@ impl Surface{
         let b : Vecn<2, f32> = Vecn::<2, f32> {data:[(bx as f32), by as f32]};
         let c : Vecn<2, f32> = Vecn::<2, f32> {data:[(cx as f32), cy as f32]};
 
-        let minx:f32 = a.data[0].min(b.data[0]).min(c.data[0]);
-        let maxx:f32 = a.data[0].max(b.data[0]).max(c.data[0]);
+        let minx:f32 = a.data[0].min(b.x()).min(c.x());
+        let maxx:f32 = a.data[0].max(b.x()).max(c.x());
 
-        let miny:f32 = a.data[1].min(b.data[1]).min(c.data[1]);
-        let maxy:f32 = a.data[1].max(b.data[1]).max(c.data[1]);
+        let miny:f32 = a.data[1].min(b.y()).min(c.y());
+        let maxy:f32 = a.data[1].max(b.y()).max(c.y());
 
         let v0 = b-a;
         let v1 = c-a;

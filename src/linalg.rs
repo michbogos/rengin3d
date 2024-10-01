@@ -21,6 +21,26 @@ pub struct Vecn<const N:usize, T>{
     pub data:[T; N]
 }
 
+impl<const N:usize, T:Algebraic<T>> Vecn<N, T>{
+    pub fn x(self)->T{
+       assert!(N>=1, "Trying to acess x of vector smaller than 1");
+       return self.data[0];
+    }
+    pub fn y(self)->T{
+        assert!(N>=2, "Trying to acess x of vector smaller than 2");
+        return self.data[1];
+    }
+
+    pub fn z(self)->T{
+        assert!(N>=3, "Trying to acess y of vector smaller than 3");
+        return self.data[2];
+    }
+    pub fn w(self)->T{
+        assert!(N>=4, "Trying to acess x of vector smaller than 4");
+        return self.data[3];
+    }
+}
+
 impl<const N:usize, T:Algebraic<T>> std::default::Default for Vecn<N, T>{
     fn default() -> Self {
         return Vecn { data: [T::default();N]};
