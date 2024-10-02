@@ -4,6 +4,7 @@ std::ops::Mul<Output=T>
 +Copy
 +std::ops::Add<Output=T>
 +std::ops::AddAssign
++std::ops::SubAssign
 +std::ops::Neg<Output=T>
 +std::default::Default
 {}
@@ -17,11 +18,15 @@ macro_rules! impl_algebraic{
 
 impl_algebraic!(isize i8 i16 i32 i64 i128 f32 f64);
 
+
+//Vectors
+
 #[derive(Debug, Copy, Clone)]
 pub struct Vecn<const N:usize, T>{
     pub data:[T; N]
 }
 
+//Methods
 impl<const N:usize, T:Algebraic<T>> Vecn<N, T>{
     pub fn x(self)->T{
        assert!(N>=1, "Trying to acess x of vector smaller than 1");
@@ -42,6 +47,7 @@ impl<const N:usize, T:Algebraic<T>> Vecn<N, T>{
     }
 }
 
+//Default
 impl<const N:usize, T:Algebraic<T>> std::default::Default for Vecn<N, T>{
     fn default() -> Self {
         return Vecn { data: [T::default();N]};
@@ -113,6 +119,122 @@ impl<const N:usize, T:Algebraic<T>> std::ops::Mul<Vecn<N,T>> for Vecn<N,T>{
         let mut res:T = T::default();
         for i in 0..N{
             res += self.data[i]*_rhs.data[i];
+        }
+        return res;
+    }
+}
+
+
+
+//Matrix stuff
+#[derive(Debug, Copy, Clone)]
+pub struct  Matrix<const N:usize, const M:usize, T>{
+    pub data:[[T;N]; M]
+}
+
+//Methods
+
+
+//Default
+impl<const N:usize, const M:usize, T:Algebraic<T>> std::default::Default for Matrix<N, M, T>{
+    fn default() -> Self {
+        return Matrix::<N, M, T>{data:[[T::default();N]; M]};
+    }
+}
+
+//Addition
+impl<const N:usize, const M:usize, T:Algebraic<T>> std::ops::Add for Matrix<N, M, T>{
+    type Output = Matrix<N, M, T>;
+    fn add(self, rhs: Self) -> Self::Output {
+        let mut res:Self::Output = Self::Output::default();
+        for i in 0..M{
+            for j in 0..N{
+                res.data[i][j] = self.data[i][j]+rhs.data[i][j];
+            }
+        }
+        return res;
+    }
+}
+impl<const N:usize, const M:usize, T:Algebraic<T>> std::ops::AddAssign for Matrix<N, M, T>{
+    fn add_assign(&mut self, rhs: Self) {
+        for i in 0..M{
+            for j in 0..N{
+                self.data[i][j] += rhs.data[i][j];
+            }
+        }
+    }
+}
+
+//Negation
+impl<const N:usize, const M:usize, T:Algebraic<T>> std::ops::Neg for Matrix<N, M, T>{
+    type Output = Matrix<N, M, T>;
+    fn neg(self) -> Self::Output {
+        let mut res:Self::Output = Self::Output::default();
+        for i in 0..M{
+            for j in 0..N{
+                res.data[i][j] = -self.data[i][j];
+            }
+        }
+        return res;
+    }
+}
+
+//Subtraction
+impl<const N:usize, const M:usize, T:Algebraic<T>> std::ops::Sub for Matrix<N, M, T>{
+    type Output = Matrix<N, M, T>;
+    fn sub(self, rhs:Self::Output) -> Self::Output {
+        return self+(-rhs);
+    }
+}
+impl<const N:usize, const M:usize, T:Algebraic<T>> std::ops::SubAssign for Matrix<N, M, T>{
+    fn sub_assign(&mut self, rhs: Self) {
+        for i in 0..M{
+            for j in 0..N{
+                self.data[i][j] -= rhs.data[i][j];
+            }
+        }
+    }
+}
+
+//Matmul
+impl<const N:usize,const M:usize, const K:usize, T:Algebraic<T>> std::ops::Mul<Matrix<M, K, T>> for Matrix<N, M, T>{
+    type Output = Matrix<N,K,T>;
+    fn mul(self, _rhs:Matrix<M, K,T>)->Matrix<N,K,T>{
+        let mut res:Self::Output = Self::Output::default();
+        for i in 0..N{
+            for j in 0..M{
+                for k in 0..K{
+                    res.data[i][k] += self.data[i][j]*_rhs.data[j][k];
+                }
+            }
+        }
+        return res;
+    }
+}
+
+//Vector matrix multiplication
+impl<const N:usize,const M:usize, T:Algebraic<T>> std::ops::Mul<Vecn<M, T>> for Matrix<N, M, T>{
+    type Output = Vecn<N,T>;
+    fn mul(self, _rhs:Vecn<M, T>)->Vecn<N,T>{
+        let mut res:Self::Output = Self::Output::default();
+        for i in 0..N{
+            for j in 0..M{
+                res.data[i] += self.data[i][j]*_rhs.data[j];
+            }
+        }
+        return res;
+    }
+}
+
+//Scaling Multiplication
+impl<const N:usize,const M:usize, T:Algebraic<T>> std::ops::Mul<T> for Matrix<N, M, T>{
+    type Output = Matrix<N,M,T>;
+    fn mul(self, _rhs:T)->Matrix<N,M,T>{
+        let mut res:Self::Output = Self::Output::default();
+        for i in 0..M{
+            for j in 0..N{
+                res.data[i][j]=self.data[i][j]*_rhs;
+            }
         }
         return res;
     }
