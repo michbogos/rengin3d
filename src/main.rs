@@ -29,17 +29,8 @@ fn main() {
         }
     }
     let mut surface : draw::Surface = draw::Surface::new(width as usize, height as usize);
-    let mut cam:Camera = Camera::default();
-    cam.near = 0.1;
-    cam.far = 2.0;
-    let proj = cam.projection_matrix();
-    let verts = cube.map(|x|proj*x);
-    reset_cursor();
-    surface.clear();
-    for i in 0..8{
-        surface.draw_triangle((verts[i%8].x()*width as f32) as i32, (verts[i%8].y()*height as f32) as i32, (verts[(i+1)%8].x()*width as f32) as i32, (verts[(i+1)%8].y()*height as f32) as i32, (verts[(i+2)%8].x()*width as f32) as i32, (verts[(i+2)%8].y()*height as f32) as i32, draw::Color {r:95, g:253, b:145});
-    }
     // surface.fill_circle(width/2, height/2, 30, draw::Color {r:128, g:65, b:234});
-    // surface.fill_triangle(0, 0, 10, 10, 10, 0, draw::Color {r:95, g:253, b:145});
+    surface.fill_triangle(0, 0, 10, 10, 10, 0, draw::Color {r:95, g:253, b:145});
+    surface.draw_triangle(0, 0, 10, 10, 10, 0, draw::Color {r:128, g:65, b:234});
     surface.show();
 }
