@@ -1,7 +1,9 @@
 use std::env;
+use std::thread;
 
 use camera::Camera;
 use draw::reset_cursor;
+use linalg::Matrix;
 use crate::linalg::Vecn;
 
 mod draw;
@@ -29,8 +31,18 @@ fn main() {
         }
     }
     let mut surface : draw::Surface = draw::Surface::new(width as usize, height as usize);
+    let mut verts:[Vecn<2, f32>;3] = [Vecn{data:[0., 0.]},Vecn{data:[10., 10.]}, Vecn{data:[10., 0.]}];
+    for i in 0..360{
+        let mut rotation = Matrix::rotation(3.1415926/360.0 as f32);
+        surface.clear();
+        reset_cursor();
+        verts[0] = rotation*verts[0];
+        verts[1] = rotation*verts[1];
+        verts[2] = rotation*verts[2];
     // surface.fill_circle(width/2, height/2, 30, draw::Color {r:128, g:65, b:234});
-    surface.fill_triangle(0, 0, 10, 10, 10, 0, draw::Color {r:95, g:253, b:145});
-    surface.draw_triangle(0, 0, 10, 10, 10, 0, draw::Color {r:128, g:65, b:234});
-    surface.show();
+        surface.fill_triangle(verts[0].x() as i32 + 10, verts[0].y() as i32 + 10, verts[1].x() as i32 + 10, verts[1].y() as i32 + 10, verts[2].x() as i32 + 10, verts[2].y() as i32 +10, draw::Color {r:95, g:253, b:145});
+        surface.draw_triangle(verts[0].x() as i32 + 10, verts[0].y() as i32 + 10, verts[1].x() as i32 + 10, verts[1].y() as i32 + 10, verts[2].x() as i32 + 10, verts[2].y() as i32 +10, draw::Color {r:95, g:253, b:145});
+        surface.show();
+        thread::sleep(std::time::Duration::from_millis(80));
+    }
 }

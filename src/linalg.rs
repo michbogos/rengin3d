@@ -133,7 +133,38 @@ pub struct  Matrix<const N:usize, const M:usize, T>{
 }
 
 //Methods
+impl Matrix<2,2, f32>{
+    pub fn rotation(theta:f32)->Matrix<2, 2, f32>{
+        let mut res:Matrix<2, 2, f32> = Matrix::<2, 2, f32>::default();
+        res.data[0][0] = theta.cos();
+        res.data[0][1] = -theta.sin();
+        res.data[1][0] = theta.sin();
+        res.data[1][1] = theta.cos();
+        return  res;
+    }
+}
 
+//Generic Matrix
+impl<const N:usize, const M:usize, T:Algebraic<T>> Matrix<N,M,T>{
+    pub fn ident(val:T)->Matrix<N,M,T>{
+        let mut res:Matrix<N,M,T> = Matrix::<N,M,T>::default();
+        for i in 0..std::cmp::min(N,M){
+            res.data[i][i]+=val;
+        }
+        return res;
+    }
+}
+
+
+//Square Matrix
+impl<const N:usize, T:Algebraic<T>> Matrix<N,N,T>{
+    pub fn scale(vec:Vecn<N, T>){
+        let mut res:Matrix<N,N,T> = Matrix::<N,N,T>::default();
+        for i in 0..N{
+            res.data[i][i]+=vec.data[i];
+        }
+    }
+}
 
 //Default
 impl<const N:usize, const M:usize, T:Algebraic<T>> std::default::Default for Matrix<N, M, T>{
