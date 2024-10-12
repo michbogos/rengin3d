@@ -2,6 +2,7 @@
 
 use std::io::Write;
 use crate::linalg::Vecn;
+use std::io::BufWriter;
 
 #[derive(Copy, Clone)]
 pub struct Color{
@@ -14,14 +15,14 @@ pub struct Surface{
     width : usize,
     height : usize,
     buffer : Vec<Color>,
-    output: std::io::Stdout
+    output: std::io::BufWriter<std::io::Stdout>,
 }
 
 
 impl Surface{
     pub fn new(width:usize, height:usize)->Surface{
         let buffer:Vec<Color> = vec![Color {r:0, g:0, b:0}; width*height];
-        let output:std::io::Stdout = std::io::stdout();
+        let output:std::io::BufWriter<std::io::Stdout> = BufWriter::new(std::io::stdout());
         return Surface {width, height, buffer, output};
     }
 
